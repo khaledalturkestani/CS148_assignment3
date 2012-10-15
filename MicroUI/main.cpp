@@ -1,18 +1,12 @@
 // main.cpp
-//
 // Starter code for CS 148 Assignment 3.
-//
 
-//
 // Include libst headers for using OpenGL and GLUT.
-//
 #include "st.h"
 #include "stgl.h"
 #include "stglut.h"
 
-//
 // Include headers for UI clases.
-//
 #include "UIBox.h"
 #include "UIDraggableBox.h"
 #include "UIButton.h"
@@ -20,20 +14,15 @@
 #include "UIWidget.h"
 #include "UILine.h"
 
-
-//
 // Include header for parsing config and line editor files
-//
 #include "parseConfig.h"
 
 #define WIN_WIDTH 512
 #define WIN_HEIGHT 512
 
-//
 // Globals used by this application.
 // As a rule, globals are Evil, but this is a small application
 // and the design of GLUT makes it hard to avoid them.
-//
 
 // Font to use for text in the UI.
 static STFont* gFont = NULL;
@@ -61,23 +50,15 @@ static char gImage2Fname[BUFSIZ];
 static char gSaveFname[BUFSIZ];
 static char gLoadFname[BUFSIZ];
 
-/** CS 148 TODO:
-*
-*   Add your own global variables, functions
-*   and classes here as needed to complete
-*   the assignment requirements.
-*/
+// My global variables
 static UIWidget* currentWidget = NULL;
 static UIWidget* currentCaptured = NULL;
 static UIWidget* currentDragged = NULL;
 UILine *currentLine;
-static int colorTracker = 0; 
-//
+static int colorTracker = 0;
 
-//
 // Add a widget to the list of widgets in the window.
 // Also sets the rectangle of the widget to the one specified.
-//
 void AddWidget(UIWidget* widget, const UIRectangle& rectangle)
 {
     widget->SetRectangle(rectangle);
@@ -103,29 +84,30 @@ void AddNewLine(STPoint2 lineEndpt1, STPoint2 lineEndpt2, ImageChoice imageChoic
      */
 }
 
-//
 // Setup routnine.
-//
 // As you progress with implementing the assignment,
 // you will want to modify this routine to create and
 // test your new widget types.
-//
 
+// Capture mouse callback function.
 void CaptureMouse(UIWidget *widget)
 {
     currentCaptured = widget;
 }
 
+// Release mouse callback function.
 void ReleaseMouse()
 {
     currentCaptured = NULL;
 }
 
+// Pushbutton testing Fire callback function
 void Firecallback(UIButton * button)
 {
-    printf("!!!!!!!! FIRE !!!!!!!!\n");
+    printf("\n!!!!!!!! FIRE !!!!!!!!\n\n");
 }
 
+// Draws all lines in the "lines" vector.
 void drawLines()
 {
     int numLines = (int) lines.size();
@@ -133,9 +115,9 @@ void drawLines()
         UILine* line = lines[j];
         line->Display();
     }
-    //glutPostRedisplay();
 }
 
+// Delete lines callback function.
 void DeleteCallback(UIButton * button)
 {
     if (lines.size() > 0) {
@@ -144,40 +126,44 @@ void DeleteCallback(UIButton * button)
     }
 }
 
+// Begin dragging callback function
 void BeginDrag(UIWidget *widget)
 {
     currentDragged = widget;
 }
 
+// End dragging callback function
 void EndDrag()
 {
     currentDragged = NULL;
 }
 
+// Check if mouse is on the end point of an of the lines drawn
 bool onEndOfLine(STPoint2& mousePos)
 {
     for (int i = 0; i < lines.size(); i++) {
         if (lines[i]->OnEndLine(mousePos)){
             currentLine = lines[i];
-            //printf("Got here!!!!!!!\n");
             return true;
         }
     }
     return false;
 }
 
+// Check if mouse is on the beginning point of an of the lines drawn
 bool onBeginOfLine(STPoint2& mousePos)
 {
     for (int i = 0; i < lines.size(); i++) {
         if (lines[i]->OnBeginLine(mousePos)){
             currentLine = lines[i];
-            printf("Got here!!!!!!!\n");
             return true;
         }
     }
     return false;
 }
 
+// Iterates through a collection of colors every time it's called when
+// drawing a new line and returns a color
 STColor4f setLineColor()
 {
     if (colorTracker == 0){
@@ -204,19 +190,12 @@ STColor4f setLineColor()
 
 void CreateWidgets()
 {
-    /** CS 148 TODO:
-    *
-    * This function should create any widgets on display
-    * when the line editor begins. You should also use
-    * it during testing to play with new widget types.
-    */
- 
     // Dgraggable Box
     //AddWidget(new UIDraggableBox(STColor4f(1,0,0,1), BeginDrag, EndDrag), UIRectangle(STPoint2(10,20), STPoint2(60, 50)));
     //AddWidget(new UILabel(gFont, "Hello World!"), UIRectangle(STPoint2(200, 200), STPoint2(110, 110)));
     //AddWidget(new UIBox(STColor4f(1,0,0,1)), UIRectangle(STPoint2(30, 30), STPoint2(80, 60)));
     
-    // Button 1
+    // Push Button Test!
     //AddWidget(new UIButton(gFont, "Khaled ROCKS", Firecallback, CaptureMouse, ReleaseMouse), UIRectangle(STPoint2(156, 156), STPoint2(356, 356)));
     
     // Line Editor Initializations
@@ -225,12 +204,11 @@ void CreateWidgets()
               UIRectangle(STPoint2(156, 10), STPoint2(356, 60)));
     AddWidget(new UIButton(gFont, "Delete Last", DeleteCallback, CaptureMouse, ReleaseMouse),
               UIRectangle(STPoint2(10, 10), STPoint2(140, 60)));
-    
-    
+    AddWidget(new UIDraggableBox(STColor4f(1,0,0,1), BeginDrag, EndDrag), UIRectangle(STPoint2(10,200), STPoint2(110, 300)));
+    AddWidget(new UIDraggableBox(STColor4f(0,0,1,1), BeginDrag, EndDrag), UIRectangle(STPoint2(110,300), STPoint2(210, 400)));
 }
-//
+
 // Display the UI, including all widgets.
-//
 void DisplayCallback()
 {
     glMatrixMode(GL_MODELVIEW);
@@ -242,13 +220,6 @@ void DisplayCallback()
 
     // Draw background
     glEnable(GL_TEXTURE_2D);
-
-    /* CS148 TODO : ONLY FOR EXTRA CREDIT
-     *
-     * Display both backgrounds for the line editor.
-     * You may display them side by side or toggle
-     * between the two images.
-     */
     
     //gBgIm1->Draw();
 
@@ -262,11 +233,7 @@ void DisplayCallback()
     
     // Draw lines
     drawLines();
-//    int numLines = (int) lines.size();
-//    for (int j = 0; j < numLines; ++j) {
-//        UILine* line = lines[j];
-//        line->Display();
-//    }
+    
     glutSwapBuffers();
 }
 
@@ -319,20 +286,20 @@ void MouseClickCallback(int button, int state, int x, int y)
             if (widget != NULL && state == GLUT_UP) { // Handle widget on mouse up
                 widget->HandleMouseUp(mousePos);
             }
-            if (widget == NULL && state == GLUT_DOWN && onEndOfLine(mousePos)) {
+            if (widget == NULL && state == GLUT_DOWN && onEndOfLine(mousePos)) { // When mouse clicks on end of line
                 currentLine->HandleMouseDown(mousePos);
                 printf("one END!\n");
-            } else if (widget == NULL && state == GLUT_DOWN && onBeginOfLine(mousePos)) {
+            } else if (widget == NULL && state == GLUT_DOWN && onBeginOfLine(mousePos)) { // When mouse clicks on beginning of a line
                 currentLine->HandleMouseDown(mousePos);
                 printf("one BEGIN!\n");
-            } else if (widget == NULL && state == GLUT_DOWN) { // When to draw a line
+            } else if (widget == NULL && state == GLUT_DOWN) { // When to draw a line (When mouse hits the baackground)
                 STColor4f color = setLineColor();
                 UILine * line = new UILine(mousePos, color);
                 lines.push_back(line);
                 currentLine = line;
                 currentLine->HandleMouseDown(mousePos);
                 printf("DRAWING!\n");
-            } else if (widget == NULL && state == GLUT_UP) {
+            } else if (widget == NULL && state == GLUT_UP) { // When done drawing or editing a line
                 currentLine->HandleMouseUp(mousePos);
             }
         }
@@ -379,11 +346,8 @@ void MouseDragCallback(int x, int y) {
     }
 }
 
-
-//
 // Initialize the application, loading resources,
 // setting state, and creating widgets.
-//
 void Initialize()
 {
     glDisable(GL_DEPTH_TEST);
@@ -396,9 +360,7 @@ void Initialize()
 
 int main(int argc, char** argv)
 {
-    //
     // Initialize GLUT.
-    //
     glutInit(&argc, argv);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowPosition(20, 20);
@@ -406,14 +368,10 @@ int main(int argc, char** argv)
         WIN_WIDTH, WIN_HEIGHT);
     glutCreateWindow("CS148 Assignment 3");
 
-    //
     // Initialize the UI.
-    //
     Initialize();
 
-    //
     // Parse config file
-    //
     parseConfigFile(
         "config.txt",
         gImage1Fname,
@@ -423,25 +381,19 @@ int main(int argc, char** argv)
         &gBgIm1,
         &gBgIm2);
 
-    //
     // Register GLUT callbacks and enter main loop.
-    //
     glutDisplayFunc(DisplayCallback);
     glutReshapeFunc(ReshapeCallback);
+   
+    // My event callbacks
     glutMouseFunc(MouseClickCallback);
     glutPassiveMotionFunc(MousePassiveCallback);
     glutMotionFunc(MouseDragCallback);
-    /** CS148 TODO:
-    *
-    *   Remember to set up any additional event
-    *   callbacks that you create.
-    */
+
     
     glutMainLoop();
 
-    //
     // Cleanup code should be called here.
-    //
     delete gBgIm1;
     delete gBgIm2;
 
